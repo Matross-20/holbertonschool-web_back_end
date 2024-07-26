@@ -1,5 +1,5 @@
 export default class ClassRoom {
-  constructor(maxStudentsSize = 0) {
+  constructor(maxStudentsSize) {
     if (typeof maxStudentsSize !== 'number') {
       throw new Error('Max student size should be a number');
     }
