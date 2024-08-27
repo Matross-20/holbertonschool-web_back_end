@@ -1,28 +1,25 @@
 #!/usr/bin/env python3
-"""
-    contains a function that measures the runtime when using wait_n
-    Imports:
-        asyncio
-        time
-        wait_n
-"""
-
-import asyncio
+""" Measure the runtime """
 import time
+import asyncio
+from typing import List
 
-wait_n = __import__("1-concurrent_coroutines").wait_n
+
+wait_n = __import__('1-concurrent_coroutines').wait_n
 
 
-def measure_time(n: int, max_delay: int = 10) -> float:
+def measure_time(max_delay: int = 10, n: int = 0) -> float:
     """
-        measures the runtime of using wait_n
         Args:
-            n (int): first arg for wait_n
-            max_delay (int): sec arg for wait_n
-        Returns:
-            a float number approximate to runtime
+            max_delay: max wait
+            n: spawn function
+
+        Return:
+            float measure time
     """
-    start_time = time.perf_counter()
-    asyncio.run(wait_n(n, max_delay))
-    elapsed_time = time.perf_counter() - start_time
-    return elapsed_time
+    first_time = time.perf_counter()
+    asyncio.run(wait_n(max_delay, n))
+    elapsed = time.perf_counter() - first_time
+    total_time = elapsed / n
+
+    return total_time
