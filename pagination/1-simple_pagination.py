@@ -66,4 +66,3 @@ class Server:
         if start_index < len(dataset):
             return dataset[start_index:end_index]
         return []
-
