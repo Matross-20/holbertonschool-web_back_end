@@ -1,11 +1,22 @@
 #!/usr/bin/env python3
-""" Route module for the API - Use user locale"""
+"""basic Flask app"""
+
+from flask import Flask, render_template, request, g
+from flask_babel import Babel, gettext
+
+app = Flask(__name__)
+babel = Babel(app)
 
 
-from flask import Flask, request, render_template, g
-from flask_babel import Babel
-from os import getenv
-from typing import Union
+class Config(object):
+    """flask app configuration"""
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
+
+
+app.config.from_object(Config)
+
 
 users = {
     1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
@@ -14,65 +25,57 @@ users = {
     4: {"name": "Teletubby", "locale": None, "timezone": "Europe/London"},
 }
 
-app = Flask(__name__)
-babel = Babel(app)
 
-
-class Config(object):
-    """ Setup - Babel configuration """
-    LANGUAGES = ['en', 'fr']
-    # these are the inherent defaults just btw
-    BABEL_DEFAULT_LOCALE = 'en'
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
-
-
-# set the above class object as the configuration for the app
-app.config.from_object('6-app.Config')
-
-
-@app.route('/', methods=['GET'], strict_slashes=False)
-def index() -> str:
-    """ GET /
-    Return: 6-index.html
+def get_user():
     """
-    return render_template('6-index.html')
+    Get a user from database.
+    """
+    user_id = request.args.get('login_as')
+    if user_id and int(user_id) in users:
+        return users[int(user_id)]
+    return None
 
 
 @babel.localeselector
-def get_locale() -> str:
-    """ Determines best match for supported languages """
-    # check if there is a locale parameter/query string
-    if request.args.get('locale'):
-        locale = request.args.get('locale')
-        if locale in app.config['LANGUAGES']:
-            return locale
-    # check if there is a locale in an existing user's profile
-    elif g.user and g.user.get('locale')\
-            and g.user.get('locale') in app.config['LANGUAGES']:
-        return g.user.get('locale')
-    # default to return as a failsafe
-    else:
-        return request.accept_languages.best_match(app.config['LANGUAGES'])
+def get_locale():
+    """
+    get_locale function
+    """
+    locale = request.args.get('locale')
+    if locale and locale in app.config['LANGUAGES']:
+        return locale
 
+    user = get_user()
+    if user and user['locale'] and user['locale'] in app.config['LANGUAGES']:
+        return user['locale']
 
-def get_user() -> Union[dict, None]:
-    """ Returns user dict if ID can be found """
-    if request.args.get('login_as'):
-        # have to type cast  the param to be able to search the user dict
-        user = int(request.args.get('login_as'))
-        if user in users:
-            return users.get(user)
-    else:
-        return None
+    header_locale = request.headers.get('locale')
+    if header_locale and header_locale in app.config['LANGUAGES']:
+        return header_locale
+
+    return app.config['BABEL_DEFAULT_LOCALE']
 
 
 @app.before_request
 def before_request():
-    """ Finds user and sets as global on flask.g.user """
+    """
+    Executed before all other functions
+    """
     g.user = get_user()
 
 
-if __name__ == "__main__":
-    host = getenv("API_HOST", "0.0.0.0")
-    port = getenv("API_PORT", "5000")
-    app.run(host=host, port=port)
+@app.route('/')
+def hello_world():
+    """
+    Render a template with a welcome message
+    """
+    welcome_message = gettext('You are not logged in.')
+    if g.user:
+        welcome_message = gettext(
+            'You are logged in as %(username)s.',
+            username=g.user['name'])
+    return render_template('6-index.html', welcome_message=welcome_message)
+
+
+if __name__ == '__main__':
+    app.run()
