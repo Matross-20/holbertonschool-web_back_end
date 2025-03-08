@@ -1,37 +1,43 @@
 #!/usr/bin/env python3
-""" Module for trying out Babel i18n """
-from flask_babel import Babel, _
-from flask import Flask, render_template, request, flash
-
-app = Flask(__name__, template_folder='templates')
-babel = Babel(app)
+"""API Basic Flask app with Babel and locale selection with URL parameter"""
+from flask import Flask, render_template, request
+from flask_babel import Babel, get_locale
 
 
-class Config(object):
-    """ Configuration Class for Babel """
+class Config():
+    """Define the Config class for Babel translation"""
+    LANGUAGES = ["en", "fr"]
+    BABEL_DEFAULT_LOCALE = "en"
+    BABEL_DEFAULT_TIMEZONE = "UTC"
 
-    LANGUAGES = ['en', 'fr']
-    BABEL_DEFAULT_LOCALE = 'en'
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
 
-
+app = Flask(__name__)
 app.config.from_object(Config)
 
 
-@app.route('/', methods=['GET'], strict_slashes=False)
-def hello_world() -> str:
-    """Renders a Basic Template for Babel Implementation"""
-    return render_template("4-index.html")
-
-
-@babel.localeselector
 def get_locale() -> str:
-    """Select a language translation to use for that request"""
-    locale = request.args.get("locale")
-    if locale and locale in app.config['LANGUAGES']:
-        return locale
+    """Determine the best match with our supported languages or
+        use locale parameter from URL.
+    """
+    # Check if 'locale' parameter is present in the query string
+    locale_param = request.args.get('locale')
+
+    # If 'locale' is present and is a supported language, return it
+    if locale_param in app.config['LANGUAGES']:
+        return locale_param
+
+    # Otherwise, return the best match based on the browser's accepted lang.
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-if __name__ == "__main__":
+babel = Babel(app, locale_selector=get_locale)
+
+
+@app.route('/')
+def index() -> str:
+    """Return the homepage index when the application startup"""
+    return render_template('4-index.html')
+
+
+if __name__ == '__main__':
     app.run()
