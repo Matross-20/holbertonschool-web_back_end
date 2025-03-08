@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""basic Flask app"""
-from flask import Flask, render_template, request, g
-from flask_babel import Babel
-import locale
+""" Module for trying out Babel i18n """
+from flask_babel import Babel, _
+from flask import Flask, render_template, request, flash
 
 app = Flask(__name__, template_folder='templates')
 babel = Babel(app)
 
 
-class Config:
-    """class cofig for the Flask app"""
-    LANGUAGES = ["en", "fr"]
+class Config(object):
+    """ Configuration Class for Babel """
+
+    LANGUAGES = ['en', 'fr']
     BABEL_DEFAULT_LOCALE = 'en'
     BABEL_DEFAULT_TIMEZONE = 'UTC'
 
@@ -18,39 +18,20 @@ class Config:
 app.config.from_object(Config)
 
 
+@app.route('/', methods=['GET'], strict_slashes=False)
+def hello_world() -> str:
+    """Renders a Basic Template for Babel Implementation"""
+    return render_template("4-index.html")
+
+
 @babel.localeselector
-def get_locale():
-    """
-    detect if the incoming request contains locale argument
-    """
-    user = getattr(g, 'user', None)
-    if user is not None:
-        return user.locale
-
-    if request.args.get('locale') in app.config['LANGUAGES']:
-        return request.args.get('locale')
-
+def get_locale() -> str:
+    """Select a language translation to use for that request"""
+    locale = request.args.get("locale")
+    if locale and locale in app.config['LANGUAGES']:
+        return locale
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-@app.before_request
-def before_request():
-    """
-    Set the user locale
-    """
-    if request.args.get('locale') in app.config['LANGUAGES']:
-        g.user = type(
-            'User', (object,), {
-                'locale': request.args.get('locale')})
-
-
-@app.route('/', methods=['GET'])
-def index():
-    """
-    Index template
-    """
-    return render_template('4-index.html')
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
