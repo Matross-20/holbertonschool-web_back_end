@@ -1,3 +1,4 @@
+Enter password: 
 -- Show and add orders
 SELECT * FROM items;
 SELECT * FROM orders;
@@ -10,4 +11,3 @@ SELECT "--";
 
 SELECT * FROM items;
 SELECT * FROM orders;
-

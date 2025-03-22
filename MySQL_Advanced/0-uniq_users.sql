@@ -1,6 +1,6 @@
--- Tâche 0 - Créer une table "users" avec email unique
+-- create table
 CREATE TABLE IF NOT EXISTS users (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255)
 );

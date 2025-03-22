@@ -1,3 +1,4 @@
+Enter password: 
 -- Show and add bonus correction
 SELECT * FROM projects;
 SELECT * FROM corrections;
@@ -14,4 +15,4 @@ CALL AddBonus((SELECT id FROM users WHERE name = "Jeanne"), "New bonus", 90);
 SELECT "--";
 
 SELECT * FROM projects;
-SELECT * FROM corrections;
+SELECT * FROM corrections
