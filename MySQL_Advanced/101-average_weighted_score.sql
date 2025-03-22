@@ -1,17 +1,18 @@
--- Yess offccc
-
+-- 13. Average weighted score for all!
+-- creates a stored procedure ComputeAverageWeightedScoreForUsers that computes and store the average weighted score for all students
+DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUsers;
 DELIMITER $$
-
-DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUsers$$
-
 CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
 BEGIN
-    UPDATE users
-    SET average_score = (
-        SELECT SUM(proj.weight * corr.score) / SUM(proj.weight)
-        FROM corrections AS corr RIGHT JOIN projects AS proj
-        ON corr.project_id = proj.id WHERE corr.user_id = users.id
-    );
-END$$
-
+    UPDATE users AS U, 
+        (SELECT U.id, SUM(score * weight) / SUM(weight) AS w_avg 
+        FROM users AS U 
+        JOIN corrections as C ON U.id=C.user_id 
+        JOIN projects AS P ON C.project_id=P.id 
+        GROUP BY U.id)
+    AS WA
+    SET U.average_score = WA.w_avg 
+    WHERE U.id=WA.id;
+END
+$$
 DELIMITER ;

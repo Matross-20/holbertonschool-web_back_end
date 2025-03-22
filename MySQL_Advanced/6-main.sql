@@ -1,27 +1,17 @@
-Enter password: 
-id  name
-1   C is fun
-2   Python is cool
-user_id project_id  score
-1   1   80
-1   2   96
-2   1   91
-2   2   73
---
---
---
---
-id  name
-1   C is fun
-2   Python is cool
-3   Bonus project
-4   New bonus
-user_id project_id  score
-1   1   80
-1   2   96
-2   1   91
-2   2   73
-2   2   100
-2   3   100
-1   3   10
-2   4   90
+-- Show and add bonus correction
+SELECT * FROM projects;
+SELECT * FROM corrections;
+
+SELECT "--";
+
+CALL AddBonus((SELECT id FROM users WHERE name = "Jeanne"), "Python is cool", 100);
+
+CALL AddBonus((SELECT id FROM users WHERE name = "Jeanne"), "Bonus project", 100);
+CALL AddBonus((SELECT id FROM users WHERE name = "Bob"), "Bonus project", 10);
+
+CALL AddBonus((SELECT id FROM users WHERE name = "Jeanne"), "New bonus", 90);
+
+SELECT "--";
+
+SELECT * FROM projects;
+SELECT * FROM corrections;

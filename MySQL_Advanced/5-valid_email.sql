@@ -1,11 +1,14 @@
--- rests valid_email when email changed
-DELIMITER $$
-DROP TRIGGER IF EXISTS rest_valid_email;
-CREATE TRIGGER rest_valid_email
+-- 5. Email validation to sent
+-- creates a trigger that resets the attribute valid_email only when the email has been changed
+DELIMITER $$ 
+CREATE TRIGGER email_trigger
 BEFORE UPDATE ON users
 FOR EACH ROW
 BEGIN
 IF NEW.email <> OLD.email
-THEN SET NEW.valid_email = 0;
+THEN
+    SET NEW.valid_email = 0;
 END IF;
-END $$
+END
+$$
+DELIMITER ;
