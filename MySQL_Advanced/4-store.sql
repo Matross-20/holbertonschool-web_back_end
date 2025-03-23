@@ -1,6 +1,8 @@
--- 4. Buy buy buy
-CREATE TRIGGER DelQuantityConsult
-AFTER INSERT ON orders
+-- script that creates a trigger that decreases
+-- the quantity of an item after adding a new order
+
+DROP TRIGGER IF EXISTS decrease;
+CREATE TRIGGER decreases AFTER INSERT ON orders
 FOR EACH ROW
 UPDATE items SET quantity = quantity - NEW.number
-WHERE NEW.item_name = name;
+WHERE name = NEW.item_name;

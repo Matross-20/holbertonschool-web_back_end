@@ -1,13 +1,16 @@
--- 5. Email validation to sent
+-- script that creates
+-- a trigger that resets the attribute valid_email
+
 DELIMITER $$
-CREATE TRIGGER change_email
-BEFORE UPDATE ON users
+
+DROP TRIGGER IF EXISTS resets;
+CREATE TRIGGER resets BEFORE UPDATE ON users
 FOR EACH ROW
 BEGIN
-IF NEW.email <> OLD.email
-THEN
-    SET NEW.valid_email = 0;
-END IF;
-END
-$$
-DELIMITER;
+    IF OLD.email != NEW.email THEN
+        SET NEW.valid_email = 0;
+    END IF;
+
+END$$
+
+DELIMITER ;
