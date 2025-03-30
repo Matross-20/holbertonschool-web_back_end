@@ -1,29 +1,35 @@
-// utils.js
-function isNegZero(n) {
-    n = Number(n);
-    return n === 0 && 1 / n === -Infinity;
-  }
+const Utils = {
+    isNegZero(n) {
+      const num = Number(n);
+      return num === 0 && 1 / num === -Infinity;
+    },
+    calculateNumber(type, a, b = 0) {
+      let aNum = Number(a);
+      let bNum = Number(b);
   
-  function calculateNumber(type, a, b) {
-    const roundedA = Math.round(a);
-    const roundedB = Math.round(b);
+      if (Number.isNaN(aNum) || Number.isNaN(bNum))
+        throw TypeError('Parameters must be numbers or able to coerce to number');
   
-    switch (type) {
-      case 'SUM':
-        return roundedA + roundedB;
-      case 'SUBTRACT':
-        return roundedA - roundedB;
-      case 'DIVIDE':
-        if (roundedB === 0) {
-          throw new Error('Cannot divide by zero');
-        }
-        const quotient = roundedA / roundedB;
-        return isNegZero(quotient) ? 0 : quotient;
+      aNum = Math.round(aNum);
+      bNum = Math.round(bNum);
   
-      default:
-        throw new Error('Invalid operation type');
+      let quotient;
+  
+      switch (type) {
+        case 'SUM':
+          return aNum + bNum;
+        case 'SUBTRACT':
+          return aNum - bNum;
+        case 'DIVIDE':
+          if (bNum === 0) return 'ERROR';
+          quotient = aNum / bNum;
+          return this.isNegZero(quotient) ? 0 : quotient;
+        default:
+          throw Error(
+            'Invalid operation type. Valid types are "SUM", "SUBTRACT", and "DIVIDE".'
+          );
+      }
     }
-  }
+  };
   
-  module.exports = { calculateNumber };
-  
+  module.exports = Utils;
